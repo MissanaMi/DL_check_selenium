@@ -102,3 +102,18 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+*.exe
+dl.side
+PyAutoIt-0.3/autoit/__init__.py
+PyAutoIt-0.3/autoit/autoit.py
+PyAutoIt-0.3/autoit/control.py
+PyAutoIt-0.3/autoit/process.py
+PyAutoIt-0.3/autoit/win.py
+PyAutoIt-0.3/MANIFEST.in
+PyAutoIt-0.3/PKG-INFO
+PyAutoIt-0.3/README.md
+PyAutoIt-0.3/README.rst
+PyAutoIt-0.3/setup.cfg
+PyAutoIt-0.3/setup.py
+yellow.py
+main.py
