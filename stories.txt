@@ -1,0 +1,96 @@
+inital page load
+\/
+start dl check
+\/
+enter first DL
+\/
+add additional DLs manually
+\/
+validate DL
+\/
+upload CSV
+\/
+proceed to conform order
+\/
+view order(DLs, Amount) personal
+\/
+view order(DLs, Amount) business
+\/
+modify order
+\/
+proceed to client information screen
+\/
+enter contact details
+\/
+cancel order
+
+______________________________________________________________
+______________________________________________________________
+
+
+inital page load
+\/
+start dl check
+\/
+enter first DL
+\/
+proceed to conform order
+\/
+view order(DLs, Amount) personal
+\/
+modify order
+\/
+proceed to client information screen
+\/
+enter contact details
+\/
+cancel order
+
+______________________________________________________________
+
+inital page load
+\/
+start dl check
+\/
+enter first DL
+\/
+add additional DLs manually
+\/
+validate DL
+\/
+proceed to conform order
+\/
+view order(DLs, Amount) business
+\/
+modify order
+\/
+proceed to client information screen
+\/
+enter contact details
+\/
+cancel order
+
+______________________________________________________________
+
+inital page load
+\/
+start dl check
+\/
+upload CSV
+\/
+validate DL
+\/
+proceed to conform order
+\/
+view order(DLs, Amount) business
+\/
+modify order
+\/
+proceed to client information screen
+\/
+enter contact details
+\/
+cancel order
+
+
+need page refreshes and a "exit script" to test page exits and if information persists or not
