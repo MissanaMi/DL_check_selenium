@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 import time
+import page_object
 
 browser = webdriver.Firefox()
 #browser = webdriver.Chrome()
@@ -19,6 +20,12 @@ dl_key =	{
 
 waittime = 1.5
 
+main_page = page_object.MainPage(browser)
+common_page = page_object.CommonPage(browser)
+enter_licence_page = page_object.EnterDL(browser)
+confirm_page = page_object.ConfirmOrder(browser)
+payment_page = page_object.Payment(browser)
+
 #do this better, probably with args, it could have been done in the time it took to write this comment
 ############################################
 dl_number = 'A0124-68024-11111'
@@ -26,26 +33,27 @@ dl_number = 'A0124-68024-11111'
 dl_numbers = ['A0124-68024-11111','A0224-68024-11111','A0324-68024-11111','A0424-68024-11111','A0524-68024-11111']
 ############################################
 
-browser.get('http://etcbitdcapmdw44.cihs.ad.gov.on.ca/Pris_Carrier/dlc/')
+common_page.get_page()
 
 #Home
-browser.find_element_by_link_text('Check Driver\'s Licence Status').click()
+time.sleep(waittime)
+main_page.proceed()
 time.sleep(waittime)
 
 #Enter License Page
 try:
-    browser.find_element_by_link_text('Multiple Licences').click()
+    enter_licence_page.multiple_licences()
     time.sleep(waittime)
 except:
     print('Multiple Licence tab not loaded')
 
-browser.find_element_by_id('licenceInput11').send_keys(dl_numbers[0][0:5])
+enter_licence_page.multiple_input1(dl_numbers[0][0:5])
 
-browser.find_element_by_id('licenceInput21').send_keys(dl_numbers[0][6:11])
+enter_licence_page.multiple_input2(dl_numbers[0][6:11])
 
-browser.find_element_by_id('licenceInput31').send_keys('aaaaa')
+enter_licence_page.multiple_input3('aaaaa')
 
-browser.find_element_by_partial_link_text('Add Licence').click()
+enter_licence_page.add_licence()
 time.sleep(waittime)
 
 #error icon should be shown for invalid format
@@ -55,9 +63,9 @@ except:
     print("DL error icon not shown")
 
 
-browser.find_element_by_id('licenceInput31').clear()
+enter_licence_page.multiple_input3_clear()
 
-browser.find_element_by_id('licenceInput31').send_keys(dl_numbers[0][12:17])
+enter_licence_page.multiple_input3(dl_numbers[0][12:17])
 
 #check icon should be shown after invalid input is corrected
 try:
@@ -65,108 +73,82 @@ try:
 except:
     print("DL check icon not shown")
 
-browser.find_element_by_partial_link_text('Add Licence').click()
+enter_licence_page.add_licence()
 
 #native alerts are a pain to deal with
-'''
-browser.find_element_by_id('licenceInput11').send_keys(dl_numbers[0][0:5])
-browser.find_element_by_id('licenceInput21').send_keys(dl_numbers[0][6:11])
-browser.find_element_by_id('licenceInput31').send_keys(dl_numbers[0][12:17])
 
-try:
-    browser.find_element_by_partial_link_text('Add Licence').click()
-except UnexpectedAlertPresentException: 
-    try:
-        alert = driver.switchTo().alert().accept()
-    except:
-        print('error with the error')
-'''
 #move this entry to a for look once the alert for duplicate is implemented
-browser.find_element_by_id('licenceInput11').send_keys(dl_numbers[1][0:5])
-browser.find_element_by_id('licenceInput21').send_keys(dl_numbers[1][6:11])
-browser.find_element_by_id('licenceInput31').send_keys(dl_numbers[1][12:17])
-browser.find_element_by_partial_link_text('Add Licence').click()
+enter_licence_page.multiple_input1(dl_numbers[1][0:5])
+enter_licence_page.multiple_input2(dl_numbers[1][6:11])
+enter_licence_page.multiple_input3(dl_numbers[1][12:17])
+enter_licence_page.add_licence()
 
-browser.find_element_by_id('licenceInput11').send_keys(dl_numbers[2][0:5])
-browser.find_element_by_id('licenceInput21').send_keys(dl_numbers[2][6:11])
-browser.find_element_by_id('licenceInput31').send_keys(dl_numbers[2][12:17])
-browser.find_element_by_partial_link_text('Add Licence').click()
+enter_licence_page.multiple_input1(dl_numbers[2][0:5])
+enter_licence_page.multiple_input2(dl_numbers[2][6:11])
+enter_licence_page.multiple_input3(dl_numbers[2][12:17])
+enter_licence_page.add_licence()
 
-browser.find_element_by_id('licenceInput11').send_keys(dl_numbers[3][0:5])
-browser.find_element_by_id('licenceInput21').send_keys(dl_numbers[3][6:11])
-browser.find_element_by_id('licenceInput31').send_keys(dl_numbers[3][12:17])
-browser.find_element_by_partial_link_text('Add Licence').click()
+enter_licence_page.multiple_input1(dl_numbers[3][0:5])
+enter_licence_page.multiple_input2(dl_numbers[3][6:11])
+enter_licence_page.multiple_input3(dl_numbers[3][12:17])
+enter_licence_page.add_licence()
 
-browser.find_element_by_id('licenceInput11').send_keys(dl_numbers[4][0:5])
-browser.find_element_by_id('licenceInput21').send_keys(dl_numbers[4][6:11])
-browser.find_element_by_id('licenceInput31').send_keys(dl_numbers[4][12:17])
-browser.find_element_by_partial_link_text('Add Licence').click()
+enter_licence_page.multiple_input1(dl_numbers[4][0:5])
+enter_licence_page.multiple_input2(dl_numbers[4][6:11])
+enter_licence_page.multiple_input3(dl_numbers[4][12:17])
+enter_licence_page.add_licence()
 
 count = 0
 for dl in dl_numbers:
-    string = '/html/body/app-root/div/app-enter-details/div/app-order-table/table/tbody/tr['+str(count+1)+']/td[2]'
-    assert dl in browser.find_element_by_xpath(string).text.replace(" ", "")
+    assert dl in enter_licence_page.table_row_column(count+1,2)
     count=count+1
+
+total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
+assert enter_licence_page.total() == total
 
 browser.refresh()
 
-try:
-    browser.find_element_by_xpath('/html/body/app-root/div/app-enter-details/div/app-order-table/table/tbody/tr[5]/td[2]').is_displayed()
-    time.sleep(waittime)
-except:
-    print('table not visible on order page ')
-    time.sleep(waittime)
-
 count = 0
 for dl in dl_numbers:
-    string = '/html/body/app-root/div/app-enter-details/div/app-order-table/table/tbody/tr['+str(count+1)+']/td[2]'
-    assert dl in browser.find_element_by_xpath(string).text.replace(" ", "")
+    assert dl in enter_licence_page.table_row_column(count+1,2)
     count=count+1
 
-browser.find_element_by_partial_link_text('Next').click()
+total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
+assert enter_licence_page.total() == total
+
+common_page.next()
 time.sleep(waittime)
 
 #Customer Information
-browser.find_element_by_id('emailAddress').send_keys("JohnSmith@gmail.com")
+confirm_page.email("JohnSmith@gmail.com")
+confirm_page.phone("905-678-9012")
+confirm_page.name("John Smith")
+confirm_page.company("N/A")
+confirm_page.address("123 Baker street")
+confirm_page.city("Toronto")
+confirm_page.postal_code("H6L5W3")
 
-browser.find_element_by_id('phoneNumber').send_keys("905-678-9012")
-
-browser.find_element_by_id('name').send_keys("John Smith")
-
-browser.find_element_by_id('company').send_keys("N/A")
-
-browser.find_element_by_id('address').send_keys("123 Baker street")
-
-browser.find_element_by_id('city').send_keys("Toronto")
-
-browser.find_element_by_id('postalCode').send_keys("H6L5W3")
-
-select = Select(browser.find_element_by_id('intendedUse'))
-select.select_by_visible_text('Personal Use')
-
-select = Select(browser.find_element_by_id('country'))
-select.select_by_visible_text('Canada')
-
-#select = Select(browser.find_element_by_id('Province'))
-#select.select_by_visible_text('Ontario')
-
-#assert items are still in cart
-try:
-    browser.find_element_by_xpath('/html/body/app-root/div/app-confirm-order/div/app-order-table/table/tbody/tr[1]/td[2]').is_displayed()
-    time.sleep(waittime)
-except:
-    print('table not visible on details page')
-    time.sleep(waittime)
+confirm_page.intended_use('Personal Use')
+confirm_page.country('Canada')
+#confirm_page.province('Ontario')
 
 count = 0
 for dl in dl_numbers:
-    string = '/html/body/app-root/div/app-confirm-order/div/app-order-table/table/tbody/tr[' + str(count+1) + ']/td[2]'
-    assert dl in browser.find_element_by_xpath(string).text.replace(" ", "")
+    assert dl in confirm_page.table_row_column(count+1,2)
     count=count+1
 
-#assert correct number of DLs in cart and price
 total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
-assert browser.find_element_by_xpath('/html/body/app-root/div/app-confirm-order/div/app-order-table/div[1]/div[2]/h4').text == total
+assert confirm_page.total() == total
+
+browser.refresh()
+
+count = 0
+for dl in dl_numbers:
+    assert dl in confirm_page.table_row_column(count+1,2)
+    count=count+1
+
+total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
+assert confirm_page.total() == total
 
 print('Business Manual Entry Test Passed')
 
@@ -194,3 +176,6 @@ assert browser.find_element_by_xpath('/html/body/app-root/div/app-report/div/tab
 '''
 
 #browser.close()
+
+
+    

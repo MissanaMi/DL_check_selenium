@@ -3,6 +3,7 @@ from selenium.webdriver.support.ui import Select
 import os
 import csv
 import time
+import page_object
 
 browser = webdriver.Firefox()
 #browser = webdriver.Chrome()
@@ -21,27 +22,34 @@ dl_key =	{
 
 waittime = 1.5
 
-browser.get('http://etcbitdcapmdw44.cihs.ad.gov.on.ca/Pris_Carrier/dlc/')
+main_page = page_object.MainPage(browser)
+common_page = page_object.CommonPage(browser)
+enter_licence_page = page_object.EnterDL(browser)
+confirm_page = page_object.ConfirmOrder(browser)
+payment_page = page_object.Payment(browser)
 
+common_page.get_page()
 
 #Home
-browser.find_element_by_link_text('Check Driver\'s Licence Status').click()
+time.sleep(waittime)
+main_page.proceed()
 time.sleep(waittime)
 
 #Enter License Page
 try:
-    browser.find_element_by_link_text('Multiple Licences').click()
+    enter_licence_page.multiple_licences()
     time.sleep(waittime)
 except:
     print('Multiple Licence tab not loaded')
 
 #radial buttons
-browser.find_element_by_xpath('/html/body/app-root/div/app-enter-details/div/div[4]/input[2]').click()
+enter_licence_page.csv_radial()
 
 #csv upload
 csv_location = os.getcwd() + '\\licences-tests.csv'
 #browser.find_element_by_id('excelInput').send_keys(csv_location)
-browser.find_element_by_xpath('//*[@id="excelInput"]').send_keys(csv_location)
+#browser.find_element_by_xpath('//*[@id="excelInput"]').send_keys(csv_location)
+enter_licence_page.csv_upload(csv_location)
 
 #error icon should be shown for invalid licences in csv
 try:
@@ -66,95 +74,65 @@ with open('licenses.csv', 'rU') as infile:
         data[header] = [value]
 from_csv = data['Drivers License']
 
-#removes invalid license number, not 100% proof(only checks length and dashes)
-print('retrived from csv:')
-print(from_csv)
 for number in from_csv:
     if number.count("-") != 2 and len(number) != 17: from_csv.remove(number)
-print('after removing invalid:')
-print(from_csv)
 
 time.sleep(waittime)
-#check to ensure all licenses are uploaded correctly
-count = 1
-for number in from_csv:
-    string = '/html/body/app-root/div/app-enter-details/div/app-order-table/table/tbody/tr[' + str(count) + ']/td[2]'
-    assert number in browser.find_element_by_xpath(string).text.replace(" ", "") 
-    count+=1
 
-#refresh to ensure sessions are working
+count = 0
+for dl in from_csv:
+    assert dl in enter_licence_page.table_row_column(count+1,2)
+    count=count+1
+
+total = 'Total Licence(s): '+str(len(from_csv))+' | Amount ($): '+str(len(from_csv)*2)+'.00'
+assert enter_licence_page.total() == total
+
+common_page.refresh()
+
+count = 0
+for dl in from_csv:
+    assert dl in enter_licence_page.table_row_column(count+1,2)
+    count=count+1
+
+total = 'Total Licence(s): '+str(len(from_csv))+' | Amount ($): '+str(len(from_csv)*2)+'.00'
+assert enter_licence_page.total() == total
+
+common_page.next()
+
+time.sleep(waittime)
+
+count = 0
+for dl in from_csv:
+    assert dl in confirm_page.table_row_column(count+1,2)
+    count=count+1
+
+total = 'Total Licence(s): '+str(len(from_csv))+' | Amount ($): '+str(len(from_csv)*2)+'.00'
+assert confirm_page.total() == total
+
 browser.refresh()
-try:
-    browser.find_element_by_xpath('/html/body/app-root/div/app-enter-details/div/app-order-table/table/tbody/tr[5]/td[2]').is_displayed()
-    time.sleep(waittime)
-except:
-    print('table not visible on order page')
-    time.sleep(waittime+5)
 
-#check to ensure all licenses are uploaded correctly after refresh
-count = 1
-for number in from_csv:
-    string = '/html/body/app-root/div/app-enter-details/div/app-order-table/table/tbody/tr[' + str(count) + ']/td[2]'
-    assert number in browser.find_element_by_xpath(string).text.replace(" ", "") 
-    count+=1
+count = 0
+for dl in from_csv:
+    assert dl in confirm_page.table_row_column(count+1,2)
+    count=count+1
 
-#Enter details page
-browser.find_element_by_partial_link_text('Next').click()
-
-try:
-    browser.find_element_by_xpath('/html/body/app-root/div/app-confirm-order/div/app-order-table/table/tbody/tr[5]/td[2]').is_displayed()
-    time.sleep(waittime)
-except:
-    print('table not visible on order page')
-    time.sleep(waittime+5)
-
-#check to ensure all licenses are uploaded correctly after refresh
-count = 1
-for number in from_csv:
-    string = '/html/body/app-root/div/app-confirm-order/div/app-order-table/table/tbody/tr[' + str(count) + ']/td[2]'
-    assert number in browser.find_element_by_xpath(string).text.replace(" ", "") 
-    count+=1
-
-#refresh to ensure sessions are working
-browser.refresh()
-try:
-    browser.find_element_by_xpath('/html/body/app-root/div/app-confirm-order/div/app-order-table/table/tbody/tr[5]/td[2]').is_displayed()
-    time.sleep(waittime)
-except:
-    print('table not visible on order page')
-    time.sleep(waittime+5)
-
-#check to ensure all licenses are uploaded correctly after refresh
-count = 1
-for number in from_csv:
-    string = '/html/body/app-root/div/app-confirm-order/div/app-order-table/table/tbody/tr[' + str(count) + ']/td[2]'
-    assert number in browser.find_element_by_xpath(string).text.replace(" ", "") 
-    count+=1
+total = 'Total Licence(s): '+str(len(from_csv))+' | Amount ($): '+str(len(from_csv)*2)+'.00'
+assert confirm_page.total() == total
 
 #Customer Information
-browser.find_element_by_id('emailAddress').send_keys("JohnSmith@gmail.com")
+confirm_page.email("JohnSmith@gmail.com")
+confirm_page.phone("905-678-9012")
+confirm_page.name("John Smith")
+confirm_page.company("N/A")
+confirm_page.address("123 Baker street")
+confirm_page.city("Toronto")
+confirm_page.postal_code("H6L5W3")
 
-browser.find_element_by_id('phoneNumber').send_keys("905-678-9012")
+confirm_page.intended_use('Personal Use')
+confirm_page.country('Canada')
+#confirm_page.province('Ontario')
 
-browser.find_element_by_id('name').send_keys("John Smith")
-
-browser.find_element_by_id('company').send_keys("N/A")
-
-browser.find_element_by_id('address').send_keys("123 Baker street")
-
-browser.find_element_by_id('city').send_keys("Toronto")
-
-browser.find_element_by_id('postalCode').send_keys("H6L5W3")
-
-select = Select(browser.find_element_by_id('intendedUse'))
-select.select_by_visible_text('Personal Use')
-
-select = Select(browser.find_element_by_id('country'))
-select.select_by_visible_text('Canada')
-
-
-print('Business Csv Entry Test Passed')
-browser.find_element_by_partial_link_text('Next').click()
+print('Business CSV Entry Test Passed')
 
 '''
 #PAYMENT PAGE !not implemented

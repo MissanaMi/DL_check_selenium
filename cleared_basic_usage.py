@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 import time
+import page_object
 
 browser = webdriver.Firefox()
 #browser = webdriver.Chrome()
@@ -19,31 +20,38 @@ dl_key =	{
 
 waittime = 1.5
 
+main_page = page_object.MainPage(browser)
+common_page = page_object.CommonPage(browser)
+enter_licence_page = page_object.EnterDL(browser)
+confirm_page = page_object.ConfirmOrder(browser)
+payment_page = page_object.Payment(browser)
+
 #do this better, probably with args, it could have been done in the time it took to write this comment
 ############################################
 dl_number = 'A0124-68024-11111'
 ############################################
 
-browser.get('http://etcbitdcapmdw44.cihs.ad.gov.on.ca/Pris_Carrier/dlc/')
+common_page.get_page()
 
 #Home
-browser.find_element_by_link_text('Check Driver\'s Licence Status').click()
+time.sleep(waittime)
+main_page.proceed()
 time.sleep(waittime)
 
 #Enter License Page
 try:
-    browser.find_element_by_link_text('One Licence').click()
+    enter_licence_page.one_licence().click()
     time.sleep(waittime)
 except:
-    print('clickable')
+    print('Already selected')
 
-browser.find_element_by_id('licenceInput10').send_keys(dl_number[0:5])
+enter_licence_page.single_input1(dl_number[0:5])
 
-browser.find_element_by_id('licenceInput20').send_keys(dl_number[6:11])
+enter_licence_page.single_input2(dl_number[6:11])
 
-browser.find_element_by_id('licenceInput30').send_keys('aaaaa')
+enter_licence_page.single_input3('aaaaa')
 
-browser.find_element_by_partial_link_text('Next').click()
+common_page.next()
 time.sleep(waittime)
 
 #error icon should be shown for invalid format
@@ -53,9 +61,9 @@ except:
     print("DL error icon not shown")
 
 
-browser.find_element_by_id('licenceInput30').clear()
+enter_licence_page.single_input3_clear()
 
-browser.find_element_by_id('licenceInput30').send_keys(dl_number[12:17])
+enter_licence_page.single_input3(dl_number[12:17])
 
 #check icon should be shown after invalid input is corrected
 try:
@@ -63,20 +71,20 @@ try:
 except:
     print("DL check icon not shown")
 
-browser.find_element_by_partial_link_text('Next').click()
+common_page.next()
 time.sleep(waittime)
 
 #assert items are still in cart
-string = '/html/body/app-root/div/app-confirm-order/div/app-order-table/table/tbody/tr/td[2]'
-
-assert dl_number in browser.find_element_by_xpath(string).text.replace(" ", "")
+assert dl_number in confirm_page.table()
 
 #assert correct number of DLs in cart and price
-assert browser.find_element_by_xpath('/html/body/app-root/div/app-confirm-order/div/app-order-table/div[1]/div[2]/h4').text == 'Total Licence(s): 1 | Amount ($): 2.00'
+assert confirm_page.total() == 'Total Licence(s): 1 | Amount ($): 2.00'
 
-browser.find_element_by_partial_link_text('Cancel').click()
+common_page.cancel()
 
-browser.find_element_by_link_text('Check Driver\'s Licence Status').click()
+#Home
+time.sleep(waittime)
+main_page.proceed()
 time.sleep(waittime)
 
 print('--',browser.find_element_by_id('licenceInput10').text,'--')
