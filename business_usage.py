@@ -4,6 +4,18 @@ import os
 import csv
 import time
 import page_object
+import pay
+
+########################################################################################
+########################################################################################
+####                                DISCLAIMER                                      ####
+####                                                                                ####
+####          This test does not use the same validation as the dlc site            ####
+####  Therefore this test is not intended to use use to test the sites validation   ####
+####                  See line ~101 for low level validation done                   ####
+####                                                                                ####
+########################################################################################
+########################################################################################
 
 browser = webdriver.Firefox()
 #browser = webdriver.Chrome()
@@ -20,13 +32,25 @@ dl_key =	{
   "A0524-68024-11111": "Valid With W Code",
 }
 
+customer_email = "JohnSmith@gmail.com"
+customer_phone = "9051234567"
+customer_name = "John Smith"
+customer_company = "N/A"
+customer_address = "123 Baker street"
+customer_city = "Toronto"
+customer_postal = "H6L5W3"
+customer_use = "Personal Use"
+customer_country = "Canada"
+customer_province = "Ontario"
+
 waittime = 1.5
 
 main_page = page_object.MainPage(browser)
 common_page = page_object.CommonPage(browser)
 enter_licence_page = page_object.EnterDL(browser)
 confirm_page = page_object.ConfirmOrder(browser)
-payment_page = page_object.Payment(browser)
+payment_page = pay.PaymentPage(browser)
+results_page = page_object.Results_single(browser)
 
 common_page.get_page()
 
@@ -120,44 +144,33 @@ total = 'Total Licence(s): '+str(len(from_csv))+' | Amount ($): '+str(len(from_c
 assert confirm_page.total() == total
 
 #Customer Information
-confirm_page.email("JohnSmith@gmail.com")
-confirm_page.phone("905-678-9012")
-confirm_page.name("John Smith")
-confirm_page.company("N/A")
-confirm_page.address("123 Baker street")
-confirm_page.city("Toronto")
-confirm_page.postal_code("H6L5W3")
+confirm_page.email(customer_email)
+confirm_page.phone(customer_phone)
+confirm_page.name(customer_name)
+confirm_page.company(customer_company)
+confirm_page.address(customer_address)
+confirm_page.city(customer_city)
+confirm_page.postal_code(customer_postal)
 
-confirm_page.intended_use('Personal Use')
-confirm_page.country('Canada')
-#confirm_page.province('Ontario')
+confirm_page.intended_use(customer_use)
+confirm_page.country(customer_country)
+confirm_page.province_canada(customer_province)
+
+common_page.next()
+
+#wait until clickable or some functio like that
+
+time.sleep(5)#long wait this page takes a while
+common_page.next()
+
+payment_page.enter_details(len(from_csv))
+
+while True:
+    try:
+        element = results_page.result_displayed()
+        break
+    except:
+        time.sleep(2)
 
 print('Business CSV Entry Test Passed')
 
-'''
-#PAYMENT PAGE !not implemented
-browser.find_element_by_partial_link_text('I Paid!').click()
-
-#RESULTS PAGE
-#allow table to load
-time.sleep(2)
-count = 1
-for number in from_csv:
-    string = '/html/body/app-root/div/app-report/div/table/tbody/tr[' + str(count) + ']/td[2]'
-    string2 = '/html/body/app-root/div/app-report/div/table/tbody/tr[' + str(count) + ']/td[3]/span'
-    #assert that correct DL number was shown
-    assert number in browser.find_element_by_xpath(string).text.replace(" ", "") 
-    #assert that correct value was returned
-    #doesnt work cuz return doesnt return right thing literally just math.random or something idk
-    #assert browser.find_element_by_xpath(string2).text == dl_key.get(number)
-    print(browser.find_element_by_xpath(string2).text, ' - should be - ',dl_key.get(number))
-    count+=1
-
-#transaction details is not implemented
-#check $$, name, address, idk whatever they inputed previously that is then shown again
-
-#
-#submit feedback
-#
-
-'''

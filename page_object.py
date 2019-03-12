@@ -39,7 +39,7 @@ class CommonPage(BasePage):
         self.browser.refresh()
 
     def get_page(self):
-        self.browser.get('https://stage.dlc.rus.mto.gov.on.ca/dlc/')
+        self.browser.get('http://etcbitdcapmdw44.cihs.ad.gov.on.ca/Pris_Carrier/dlc/')
 
 class EnterDL(BasePage):
 
@@ -68,11 +68,11 @@ class EnterDL(BasePage):
         element.clear()
 
     def manual_radial(self):
-        element = self.browser.find_element_by_xpath('/html/body/app-root/div/app-enter-details/div/div[4]/input[1]')
+        element = self.browser.find_element_by_link_text('Enter Manually')
         element.click()
 
     def csv_radial(self):
-        element = self.browser.find_element_by_xpath('/html/body/app-root/div/app-enter-details/div/div[4]/input[2]')
+        element = self.browser.find_element_by_link_text('Upload a CSV File')
         element.click()
 
     def csv_upload(self,location):
@@ -100,10 +100,10 @@ class EnterDL(BasePage):
         element.click()
 
     def total(self):
-        return self.browser.find_element_by_xpath('/html/body/app-root/div/app-enter-details/div/app-order-table/div[1]/div[2]/h4').text
+        return self.browser.find_element_by_xpath('/html/body/app-root/app-enter-details/div/app-order-table/div[1]/div[2]/h4').text
 
     def table_row_column(self,row,column):
-        return self.browser.find_element_by_xpath('/html/body/app-root/div/app-enter-details/div/app-order-table/table/tbody/tr['+str(row)+']/td['+str(column)+']').text.replace(" ", "")
+        return self.browser.find_element_by_xpath('/html/body/app-root/app-enter-details/div/app-order-table/table/tbody/tr['+str(row)+']/td['+str(column)+']').text.replace(" ", "")
 
     def load_more(self):
         element = self.browser.find_element_by_link_text('Load More')
@@ -134,8 +134,8 @@ class ConfirmOrder(BasePage):
         element.send_keys(value)
     
     def country(self,value):
-        select = Select(self.browser.find_element_by_id('country'))
-        select.select_by_visible_text(value)
+        element = self.browser.find_element_by_link_text(value)
+        element.click()
 
     def address(self,value):
         element = self.browser.find_element_by_id('address')
@@ -145,66 +145,49 @@ class ConfirmOrder(BasePage):
         element = self.browser.find_element_by_id('city')
         element.send_keys(value)
 
-    def province(self,value):
-        select = Select(self.browser.find_element_by_id('Province'))
+    def province_canada(self,value):
+        select = Select(self.browser.find_element_by_id('provinceId'))
         select.select_by_visible_text(value)
+
+    def state_usa(self,value):
+        element = 1+1
+        #implement me
+
+    def province_other(self,value):
+        element = 1+1
+        #implement me
 
     def postal_code(self,value):
         element = self.browser.find_element_by_id('postalCode')
         element.send_keys(value)
 
     def total(self):
-        return self.browser.find_element_by_xpath('/html/body/app-root/div/app-confirm-order/div/app-order-table/div[1]/div[2]/h4').text
+        return self.browser.find_element_by_xpath('/html/body/app-root/app-confirm-order/div/app-order-table/div[1]/div[2]/h4').text
 
     def table(self):
-        return self.browser.find_element_by_xpath('/html/body/app-root/div/app-confirm-order/div/app-order-table/table/tbody/tr/td[2]').text.replace(" ", "")
+        return self.browser.find_element_by_xpath('/html/body/app-root/app-confirm-order/div/app-order-table/table/tbody/tr/td[2]').text.replace(" ", "")
 
     def table_row_column(self,row,column):
-        return self.browser.find_element_by_xpath('/html/body/app-root/div/app-confirm-order/div/app-order-table/table/tbody/tr['+str(row)+']/td['+str(column)+']').text.replace(" ", "")
+        return self.browser.find_element_by_xpath('/html/body/app-root/app-confirm-order/div/app-order-table/table/tbody/tr['+str(row)+']/td['+str(column)+']').text.replace(" ", "")
 
     def load_more(self):
         element = self.browser.find_element_by_link_text('Load More')
         element.click()
         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
-class Payment(BasePage):
-
-    def amount(self,value):
-        element = self.browser.find_element_by_link_text('')
-        element.send_keys(value)
-
-    def name_on_card(self,value):
-        element = self.browser.find_element_by_link_text('')
-        element.send_keys(value)
-
-    def card_type(self,value):
-        element = self.browser.find_element_by_link_text('')
-        element.send_keys(value)
-
-    def card_number(self,value):
-        element = self.browser.find_element_by_link_text('')
-        element.send_keys(value)
-
-    def month(self,value):
-        element = self.browser.find_element_by_link_text('')
-        element.send_keys(value)
+class Results_single(BasePage):
+    def status(self,value):
+        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[4]/div[1]/div/h4[1]').text == value
     
-    def year(self,value):
-        element = self.browser.find_element_by_link_text('')
-        element.send_keys(value)
-
-    def cvd(self,value):
-        element = self.browser.find_element_by_link_text('')
-        element.send_keys(value)
-
-    def back(self,value):
-        element = self.browser.find_element_by_link_text('')
-        element.send_keys(value)
-
-    def pay(self,value):
-        element = self.browser.find_element_by_link_text('')
-        element.send_keys(value)
-
+    def description(self,value):
+        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[4]/div[3]/div/p').text == value
     
-
-
+    def dl_number(self,value):
+        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[4]/div[1]/div/h4[2]').text == value
+    
+    def purchaser_name(self,value):
+        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/div/div/div[1]/div/div[12]').text == value
+    
+    def result_price(self,value):
+        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/div/div/div[2]/div/div[2]').text == value
+    

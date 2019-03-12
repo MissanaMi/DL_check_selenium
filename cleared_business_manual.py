@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 import time
 import os
+import page_object
 
 browser = webdriver.Firefox()
 #browser = webdriver.Chrome(os.getcwd() +'\chromedriver.exe')
@@ -20,22 +21,29 @@ dl_key =	{
 
 waittime = 1.5
 
+main_page = page_object.MainPage(browser)
+common_page = page_object.CommonPage(browser)
+enter_licence_page = page_object.EnterDL(browser)
+confirm_page = page_object.ConfirmOrder(browser)
+payment_page = page_object.Payment(browser)
+
 #this can be moved to a csv for testing
 dl_numbers = ['A0124-68024-11111','A0224-68024-11111','A0324-68024-11111','A0424-68024-11111','A0524-68024-11111']
 
 def main():
-    browser.get('http://etcbitdcapmdw44.cihs.ad.gov.on.ca/Pris_Carrier/dlc/')
-    
+    common_page.get_page()
+
     #Home
-    browser.find_element_by_link_text('Check Driver\'s Licence Status').click()
+    time.sleep(waittime)
+    main_page.proceed()
     time.sleep(waittime)
 
     #Enter License Page
     try:
-        browser.find_element_by_link_text('Multiple Licences').click()
+        enter_licence_page.multiple_licences()
         time.sleep(waittime)
     except:
-        print('Multiple Licence tab not loaded')
+        print('Already selected')
 
     populate()
 
@@ -46,41 +54,41 @@ def main():
         count=count+1
 
     #radial buttons
-    browser.find_element_by_xpath('/html/body/app-root/div/app-enter-details/div/div[4]/input[2]').click()
+    enter_licence_page.csv_radial()
     time.sleep(waittime)
-    browser.find_element_by_xpath('/html/body/app-root/div/app-enter-details/div/div[4]/input[1]').click()
+    enter_licence_page.manual_radial()
 
     try:
-        browser.find_element_by_xpath('/html/body/app-root/div/app-enter-details/div/app-order-table/table/tbody/tr[1]/td[2]').is_displayed()
+        enter_licence_page.table_row_column(1,2).is_displayed()
     except:
         print('Step Passed: table is empty after tab change')
 
     populate()
 
-    browser.find_element_by_link_text('Cancel').click()
+    common_page.cancel()
 
-    browser.find_element_by_link_text('Check Driver\'s Licence Status').click()
+    main_page.proceed()
     time.sleep(waittime)
 
     #Enter License Page
     try:
-        browser.find_element_by_link_text('Multiple Licences').click()
+        enter_licence_page.multiple_licences()
         time.sleep(waittime)
     except:
         print('Multiple Licence tab not loaded')
     
     try:
-        browser.find_element_by_xpath('/html/body/app-root/div/app-enter-details/div/app-order-table/table/tbody/tr[1]/td[2]').is_displayed()
+        enter_licence_page.table_row_column(1,2).is_displayed()
     except:
         print('Step Passed: table is empty after pressing cancel')
 
 def populate():
 
     for dl in dl_numbers:
-        browser.find_element_by_id('licenceInput11').send_keys(dl[0:5])
-        browser.find_element_by_id('licenceInput21').send_keys(dl[6:11])
-        browser.find_element_by_id('licenceInput31').send_keys(dl[12:17])
-        browser.find_element_by_partial_link_text('Add Licence').click()
+        enter_licence_page.multiple_input1(dl[0:5])
+        enter_licence_page.multiple_input2(dl[6:11])
+        enter_licence_page.multiple_input3(dl[12:17])
+        enter_licence_page.add_licence()
 
 if __name__ == '__main__':
     main()

@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 import time
 import page_object
+import pay
 
 browser = webdriver.Firefox()
 #browser = webdriver.Chrome()
@@ -18,20 +19,32 @@ dl_key =	{
   "A0524-68024-11111": "Valid With W Code",
 }
 
+customer_email = "JohnSmith@gmail.com"
+customer_phone = "9051234567"
+customer_name = "John Smith"
+customer_company = "N/A"
+customer_address = "123 Baker street"
+customer_city = "Toronto"
+customer_postal = "H6L5W3"
+customer_use = "Personal Use"
+customer_country = "Canada"
+customer_province = "Ontario"
+
 waittime = 1.5
 
 main_page = page_object.MainPage(browser)
 common_page = page_object.CommonPage(browser)
 enter_licence_page = page_object.EnterDL(browser)
 confirm_page = page_object.ConfirmOrder(browser)
-payment_page = page_object.Payment(browser)
+payment_page = pay.PaymentPage(browser)
+results_single_page = page_object.Results_single(browser)
 
 #do this better, probably with args, it could have been done in the time it took to write this comment
 ############################################
 dl_number = 'A0124-68024-11111'
 ############################################
 
-browser.get('http://etcbitdcapmdw44.cihs.ad.gov.on.ca/Pris_Carrier/dlc/')
+common_page.get_page()
 
 #Home
 time.sleep(waittime)
@@ -51,6 +64,7 @@ enter_licence_page.single_input1(dl_number[0:5])
 enter_licence_page.single_input2(dl_number[6:11])
 
 enter_licence_page.single_input3('aaaaa')
+time.sleep(waittime/4)
 
 common_page.next()
 time.sleep(waittime)
@@ -75,22 +89,6 @@ except:
 common_page.next()
 time.sleep(waittime)
 
-#Customer Information
-confirm_page.email("JohnSmith@gmail.com")
-confirm_page.phone("905-678-9012")
-confirm_page.name("John Smith")
-confirm_page.company("N/A")
-confirm_page.address("123 Baker street")
-confirm_page.city("Toronto")
-confirm_page.postal_code("H6L5W3")
-
-confirm_page.intended_use('Personal Use')
-
-confirm_page.country('Canada')
-
-#confirm_page.province('Ontario')
-
-
 #assert items are still in cart
 assert dl_number in confirm_page.table()
 
@@ -106,26 +104,40 @@ assert dl_number in confirm_page.table()
 #assert correct number of DLs in cart and price
 assert confirm_page.total() == 'Total Licence(s): 1 | Amount ($): 2.00'
 
-print('Basic Usage Test Passed')
+#Customer Information
+confirm_page.email(customer_email)
+confirm_page.phone(customer_phone)
+confirm_page.name(customer_name)
+confirm_page.company(customer_company)
+confirm_page.address(customer_address)
+confirm_page.city(customer_city)
+confirm_page.postal_code(customer_postal)
 
-#browser.find_element_by_partial_link_text('Next').click()
+confirm_page.intended_use(customer_use)
 
-'''
-#payment page !not implemented
-browser.find_element_by_partial_link_text('I Paid!').click()
+confirm_page.country(customer_country)
 
-#results
-time.sleep(waittime)
-#print(browser.find_element_by_xpath('/html/body/app-root/div/app-report/div/table/tbody/tr/td[3]/span').text)
-assert browser.find_element_by_xpath('/html/body/app-root/div/app-report/div/table/tbody/tr/td[3]/span').text == dl_key.get(dl_number)
+confirm_page.province_canada(customer_province)
 
-#
-#asserts for all payment information when implemented 
-#
+common_page.next()
 
-#
-#submit feedback
-#
-'''
+#wait until clickable or some functio like that
 
-#browser.close()
+time.sleep(5)#long wait this page takes a while
+common_page.next()
+
+payment_page.enter_details(1)
+
+time.sleep(10)
+
+##############################ReSUlTs CHeCk#####################
+
+#results_single_page.status() ####no confirmed statuses given for spefic DL
+#results_single_page.description() ####above
+results_single_page.dl_number(dl_number)
+results_single_page.purchaser_name(customer_name)
+result_price = '$2.00 CAD'
+results_single_page.result_price(result_price)
+payment_page.payment_results()
+
+print('Basic Usage Passing')

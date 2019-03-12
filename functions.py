@@ -7,28 +7,28 @@ waittime= 1.5
 
 def details_populate():
     #Customer Information
-    browser.find_element_by_id('emailAddress').send_keys("JohnSmith@gmail.com")
+    browser.find_element_by_id('emailAddress').send_keys(customer_email)
 
-    browser.find_element_by_id('phoneNumber').send_keys("905-678-9012")
+    browser.find_element_by_id('phoneNumber').send_keys(customer_phone)
 
-    browser.find_element_by_id('name').send_keys("John Smith")
+    browser.find_element_by_id('name').send_keys(customer_name)
 
-    browser.find_element_by_id('company').send_keys("N/A")
+    browser.find_element_by_id('company').send_keys(customer_company)
 
-    browser.find_element_by_id('address').send_keys("123 Baker street")
+    browser.find_element_by_id('address').send_keys(customer_address)
 
-    browser.find_element_by_id('city').send_keys("Toronto")
+    browser.find_element_by_id('city').send_keys(customer_city)
 
-    browser.find_element_by_id('postalCode').send_keys("H6L5W3")
+    browser.find_element_by_id('postalCode').send_keys(customer_postal)
 
     select = Select(browser.find_element_by_id('intendedUse'))
-    select.select_by_visible_text('Personal Use')
+    select.select_by_visible_text(customer_use)
 
     select = Select(browser.find_element_by_id('country'))
-    select.select_by_visible_text('Canada')
+    select.select_by_visible_text(customer_country)
 
     #select = Select(browser.find_element_by_id('Province'))
-    #select.select_by_visible_text('Ontario')
+    #select.select_by_visible_text(customer_province)
 
 def csv_upload():
     #csv upload

@@ -87,9 +87,11 @@ time.sleep(waittime)
 main_page.proceed()
 time.sleep(waittime)
 
-print('--',browser.find_element_by_id('licenceInput10').text,'--')
-assert browser.find_element_by_id('licenceInput10').text == ''
-assert browser.find_element_by_id('licenceInput20').text == ''
-assert browser.find_element_by_id('licenceInput30').text == ''
+'''
+print('-',enter_licence_page.single_input1.text,'-')
+assert enter_licence_page.single_input1 == '  '
+assert enter_licence_page.single_input2 == '  '
+assert enter_licence_page.single_input3 == '  '
 
 print('Feilds Cleared Test Passed')
+'''

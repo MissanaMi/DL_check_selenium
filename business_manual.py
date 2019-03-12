@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 import time
 import page_object
+import pay
 
 browser = webdriver.Firefox()
 #browser = webdriver.Chrome()
@@ -20,11 +21,23 @@ dl_key =	{
 
 waittime = 1.5
 
+customer_email = "JohnSmith@gmail.com"
+customer_phone = "9051234567"
+customer_name = "John Smith"
+customer_company = "N/A"
+customer_address = "123 Baker street"
+customer_city = "Toronto"
+customer_postal = "H6L5W3"
+customer_use = "Personal Use"
+customer_country = "Canada"
+customer_province = "Ontario"
+
 main_page = page_object.MainPage(browser)
 common_page = page_object.CommonPage(browser)
 enter_licence_page = page_object.EnterDL(browser)
 confirm_page = page_object.ConfirmOrder(browser)
-payment_page = page_object.Payment(browser)
+payment_page = pay.PaymentPage(browser)
+results_page = page_object.Results_single(browser)
 
 #do this better, probably with args, it could have been done in the time it took to write this comment
 ############################################
@@ -98,6 +111,7 @@ enter_licence_page.multiple_input2(dl_numbers[4][6:11])
 enter_licence_page.multiple_input3(dl_numbers[4][12:17])
 enter_licence_page.add_licence()
 
+time.sleep(waittime)
 count = 0
 for dl in dl_numbers:
     assert dl in enter_licence_page.table_row_column(count+1,2)
@@ -119,19 +133,6 @@ assert enter_licence_page.total() == total
 common_page.next()
 time.sleep(waittime)
 
-#Customer Information
-confirm_page.email("JohnSmith@gmail.com")
-confirm_page.phone("905-678-9012")
-confirm_page.name("John Smith")
-confirm_page.company("N/A")
-confirm_page.address("123 Baker street")
-confirm_page.city("Toronto")
-confirm_page.postal_code("H6L5W3")
-
-confirm_page.intended_use('Personal Use')
-confirm_page.country('Canada')
-#confirm_page.province('Ontario')
-
 count = 0
 for dl in dl_numbers:
     assert dl in confirm_page.table_row_column(count+1,2)
@@ -150,32 +151,33 @@ for dl in dl_numbers:
 total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
 assert confirm_page.total() == total
 
+#Customer Information
+confirm_page.email(customer_email)
+confirm_page.phone(customer_phone)
+confirm_page.name(customer_name)
+confirm_page.company(customer_company)
+confirm_page.address(customer_address)
+confirm_page.city(customer_city)
+confirm_page.postal_code(customer_postal)
+
+confirm_page.intended_use(customer_use)
+confirm_page.country(customer_country)
+confirm_page.province_canada(customer_province)
+
+common_page.next()
+
+#wait until clickable or some functio like that
+
+time.sleep(5)#long wait this page takes a while
+common_page.next()
+
+payment_page.enter_details(len(dl_numbers))
+
+while True:
+    try:
+        element = results_page.result_displayed()
+        break
+    except:
+        time.sleep(2)
+
 print('Business Manual Entry Test Passed')
-
-#browser.find_element_by_partial_link_text('Next').click()
-
-
-
-#not implemented stuff
-'''
-#payment page !not implemented
-browser.find_element_by_partial_link_text('I Paid!').click()
-
-#results
-time.sleep(waittime)
-#print(browser.find_element_by_xpath('/html/body/app-root/div/app-report/div/table/tbody/tr/td[3]/span').text)
-assert browser.find_element_by_xpath('/html/body/app-root/div/app-report/div/table/tbody/tr/td[3]/span').text == dl_key.get(dl_number)
-
-#
-#asserts for all payment information when implemented 
-#
-
-#
-#submit feedback
-#
-'''
-
-#browser.close()
-
-
-    
