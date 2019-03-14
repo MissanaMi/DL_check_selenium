@@ -11,16 +11,6 @@ browser = webdriver.Firefox()
 #browser = webdriver.Edge()
 #browser = webdriver.Ie(r"C:\\Users\\MissanMi\\project\\DL_check_selenium\\IEDriverServer.exe")
 
-#value key for correct returns for certain DL numbers
-#maybe move this to the csv column two just for testing? #### | valid/invalid/etc
-dl_key =	{
-  "A0124-68024-11111": "Valid",
-  "A0224-68024-11111": "Not Valid",
-  "A0324-68024-11111": "Not Found",
-  "A0424-68024-11111": "Valid With Ignition Interlock",
-  "A0524-68024-11111": "Valid With W Code",
-}
-
 customer_email = "JohnSmith@gmail.com"
 customer_phone = "9051234567"
 customer_name = "John Smith"
@@ -40,6 +30,7 @@ enter_licence_page = page_object.EnterDL(browser)
 confirm_page = page_object.ConfirmOrder(browser)
 payment_page = pay.PaymentPage(browser)
 results_page = page_object.Results_single(browser)
+results_page_multiple = page_object.Results_multiple(browser)
 
 dl_numbers = []
 
@@ -59,7 +50,11 @@ except:
 
 
 #generate 100 random dls
-for i in range(99):
+total_dls = 54
+#click more x many times
+mores = 5
+
+for i in range(total_dls):
     dl_number = random.choice(string.ascii_uppercase)
     for j in range(14):
         if j == 12:
@@ -82,7 +77,7 @@ for i in range(99):
 
 time.sleep(waittime)
 
-for _ in range(9):
+for _ in range(mores):
     enter_licence_page.load_more()
     time.sleep(waittime*2)
 
@@ -96,7 +91,7 @@ assert enter_licence_page.total() == total
 
 browser.refresh()
 
-for _ in range(9):
+for _ in range(mores):
     enter_licence_page.load_more()
     time.sleep(waittime*2)
 
@@ -126,7 +121,7 @@ confirm_page.country(customer_country)
 confirm_page.province_canada(customer_province)
 
 
-for _ in range(9):
+for _ in range(mores):
     confirm_page.load_more()
     time.sleep(waittime*2)
 
@@ -140,21 +135,36 @@ assert confirm_page.total() == total
 
 common_page.next()
 
-#wait until clickable or some functio like that
-
-time.sleep(5)#long wait this page takes a while
-common_page.next()
-
-payment_page.enter_details(1)
-
 while True:
     try:
-        element = results_page.result_displayed()
-        break
+        common_page.next()
     except:
-        time.sleep(2)
+        time.sleep(waittime)
+    if 'https://www.beanstream.com' in browser.current_url:
+        break
 
 
+payment_page.enter_details(total_dls)
 
+while True:
+    if 'Pris_Carrier/dlc/report' in browser.current_url:
+        break
+    time.sleep(5)
 
-print('Business Manual Entry Test Passed')
+#results_single_page.status()       no confirmed statuses given for spefic DL
+#results_single_page.description()  ^^^^
+results_page_multiple.expand()
+
+#purchaser name
+results_page_multiple.purchaser_name(customer_name)
+
+#confirm trasaction price
+result_price = '$'+str(len(dl_numbers)*2)+'.00 CAD'
+results_page_multiple.result_price(result_price)
+
+#confirm payment details
+payment_page.payment_results()
+
+print('Basic Usage Passing')
+
+browser.close()

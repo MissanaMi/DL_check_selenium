@@ -22,16 +22,6 @@ browser = webdriver.Firefox()
 #browser = webdriver.Edge()
 #browser = webdriver.Ie(r"C:\\Users\\MissanMi\\project\\DL_check_selenium\\IEDriverServer.exe")
 
-#value key for correct returns for certain DL numbers
-#maybe move this to the csv column two just for testing? #### | valid/invalid/etc
-dl_key =	{
-  "A0124-68024-11111": "Valid",
-  "A0224-68024-11111": "Not Valid",
-  "A0324-68024-11111": "Not Found",
-  "A0424-68024-11111": "Valid With Ignition Interlock",
-  "A0524-68024-11111": "Valid With W Code",
-}
-
 customer_email = "JohnSmith@gmail.com"
 customer_phone = "9051234567"
 customer_name = "John Smith"
@@ -50,7 +40,7 @@ common_page = page_object.CommonPage(browser)
 enter_licence_page = page_object.EnterDL(browser)
 confirm_page = page_object.ConfirmOrder(browser)
 payment_page = pay.PaymentPage(browser)
-results_page = page_object.Results_single(browser)
+results_page = page_object.Results_multiple(browser)
 
 common_page.get_page()
 
@@ -86,7 +76,7 @@ except:
 #ensuring that all entries from the csv were uploaded,note validation is not 100%
 #
 # open the file in universal line ending mode 
-with open('licenses.csv', 'rU') as infile:
+with open('licences-tests.csv', 'rU') as infile:
   # read the file as a dictionary for each row ({header : value})
   reader = csv.DictReader(infile)
   data = {}
@@ -96,15 +86,16 @@ with open('licenses.csv', 'rU') as infile:
         data[header].append(value)
       except KeyError:
         data[header] = [value]
-from_csv = data['Drivers License']
+from_csv = data['Drivers Licence']
 
 for number in from_csv:
     if number.count("-") != 2 and len(number) != 17: from_csv.remove(number)
 
 time.sleep(waittime)
-
+print(from_csv)
 count = 0
 for dl in from_csv:
+    print(dl,'=',enter_licence_page.table_row_column(count+1,2))
     assert dl in enter_licence_page.table_row_column(count+1,2)
     count=count+1
 
@@ -158,19 +149,43 @@ confirm_page.province_canada(customer_province)
 
 common_page.next()
 
-#wait until clickable or some functio like that
-
-time.sleep(5)#long wait this page takes a while
-common_page.next()
-
-payment_page.enter_details(len(from_csv))
 
 while True:
     try:
-        element = results_page.result_displayed()
-        break
+        common_page.next()
     except:
-        time.sleep(2)
+        time.sleep(waittime)
+    if 'https://www.beanstream.com' in browser.current_url:
+        break
 
-print('Business CSV Entry Test Passed')
 
+payment_page.enter_details(len(from_csv))
+
+
+while browser.current_url != 'http://etcbitdcapmdw30.cihs.ad.gov.on.ca/Pris_Carrier/dlc/report':
+    time.sleep(5)
+    
+
+#results_single_page.status()       no confirmed statuses given for spefic DL
+#results_single_page.description()  ^^^^
+results_page.expand()
+
+#purchaser name
+results_page.purchaser_name(customer_name)
+
+#confirm price on transaction details
+result_price = '$'+str(len(from_csv)*2)+'.00 CAD'
+results_page.result_price(result_price)
+
+#confirm dl and status
+results_page.dl_number_and_status(from_csv)
+
+#print status totals 
+print(results_page.status())
+
+#confirm payment info
+payment_page.payment_results()
+
+print('Basic Usage Passing')
+
+browser.close()

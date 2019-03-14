@@ -4,6 +4,21 @@ import time
 
 waittime = 1
 
+BaseURL = 'http://etcbitdcapmdw30.cihs.ad.gov.on.ca/Pris_Carrier/dlc/'
+
+dl_key =	{
+    'L0127-15675-70417': 'Not Found',
+    'K0733-19005-65811': 'Not Valid',
+    'M2135-18407-40922': 'Not Valid',
+    'M8231-35818-00102': 'Not Found',
+    'A1742-60506-10101': 'Valid (Ignition Interlock Required)',
+    'A5359-30506-71010': 'Valid',
+    'L0001-75688-30707': 'Not Valid',
+    'K0733-12887-35522': 'Not Found',
+    'T7565-75205-80513': 'Not Valid',
+    'A1013-78506-55101': 'Not Found'
+}
+
 class BasePage(object):
     """Base class to initialize the base page that will be called from all pages"""
 
@@ -39,7 +54,10 @@ class CommonPage(BasePage):
         self.browser.refresh()
 
     def get_page(self):
-        self.browser.get('http://etcbitdcapmdw44.cihs.ad.gov.on.ca/Pris_Carrier/dlc/')
+        self.browser.get(BaseURL)
+    
+    def get_baseurl(self):
+        return BaseURL
 
 class EnterDL(BasePage):
 
@@ -48,7 +66,7 @@ class EnterDL(BasePage):
         element.click()
 
     def multiple_licences(self):
-        element = self.browser.find_element_by_link_text('Multiple Licences')
+        element = self.browser.find_element_by_link_text('Check Multiple Driver\'s Licences')
         element.click()
 
     def single_input1(self,number):
@@ -191,3 +209,38 @@ class Results_single(BasePage):
     def result_price(self,value):
         assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/div/div/div[2]/div/div[2]').text == value
     
+class Results_multiple(BasePage):
+    def status(self):
+        values = []
+
+        for i in range(1,6):
+            string = '/html/body/app-root/app-report/div/div[4]/div['+str(i)+']/div/div[3]/p'
+            values.append(self.browser.find_element_by_xpath(string).text)
+        return values
+
+    #will need to supply an array of status's(or 2d with dl_numbers) to check coresponding dl returned right result
+    def dl_number(self,dl_numbers):
+        count = 1
+        for dl in dl_numbers:
+            assert dl in self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/table/tbody/tr['+str(count)+']/td[2]').text
+            count=count+1
+
+    def dl_number_and_status(self,dl_numbers):
+        count = 1
+        for dl in dl_numbers:
+            assert dl in self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/table/tbody/tr['+str(count)+']/td[2]').text
+
+            print(dl,':',dl_key[dl],'==',self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/table/tbody/tr['+str(count)+']/td[3]').text)
+            assert dl_key[dl] in self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/table/tbody/tr['+str(count)+']/td[3]').text
+            count=count+1
+
+        
+
+    def purchaser_name(self,value):
+        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/div/div/div[1]/div/div[12]').text == value
+    
+    def result_price(self,value):
+        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/div/div/div[2]/div/div[2]').text == value
+
+    def expand(self):
+        self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/a/div/div[2]/span/span').click()

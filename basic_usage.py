@@ -9,16 +9,6 @@ browser = webdriver.Firefox()
 #browser = webdriver.Edge()
 #browser = webdriver.Ie(r"C:\\Users\\MissanMi\\project\\DL_check_selenium\\IEDriverServer.exe")
 
-#value key for correct returns for certain DL numbers
-#maybe move this to the csv column two just for testing? #### | valid/invalid/etc
-dl_key =	{
-  "A0124-68024-11111": "Valid",
-  "A0224-68024-11111": "Not Valid",
-  "A0324-68024-11111": "Not Found",
-  "A0424-68024-11111": "Valid With Ignition Interlock",
-  "A0524-68024-11111": "Valid With W Code",
-}
-
 customer_email = "JohnSmith@gmail.com"
 customer_phone = "9051234567"
 customer_name = "John Smith"
@@ -26,7 +16,7 @@ customer_company = "N/A"
 customer_address = "123 Baker street"
 customer_city = "Toronto"
 customer_postal = "H6L5W3"
-customer_use = "Personal Use"
+customer_use = "Business Use"
 customer_country = "Canada"
 customer_province = "Ontario"
 
@@ -112,18 +102,15 @@ confirm_page.company(customer_company)
 confirm_page.address(customer_address)
 confirm_page.city(customer_city)
 confirm_page.postal_code(customer_postal)
-
 confirm_page.intended_use(customer_use)
-
 confirm_page.country(customer_country)
-
 confirm_page.province_canada(customer_province)
 
 common_page.next()
 
 #wait until clickable or some functio like that
 
-time.sleep(5)#long wait this page takes a while
+time.sleep(10)#long wait this page takes a while
 common_page.next()
 
 payment_page.enter_details(1)
@@ -141,3 +128,5 @@ results_single_page.result_price(result_price)
 payment_page.payment_results()
 
 print('Basic Usage Passing')
+
+browser.close()
