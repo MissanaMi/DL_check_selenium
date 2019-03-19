@@ -1,5 +1,4 @@
 from selenium import webdriver
-from selenium.webdriver.support.ui import Select
 import os
 import csv
 import time
@@ -18,9 +17,9 @@ import pay
 ########################################################################################
 
 browser = webdriver.Firefox()
-#browser = webdriver.Chrome()
-#browser = webdriver.Edge()
-#browser = webdriver.Ie(r"C:\\Users\\MissanMi\\project\\DL_check_selenium\\IEDriverServer.exe")
+# browser = webdriver.Chrome()
+# browser = webdriver.Edge()
+# browser = webdriver.Ie(r"C:\\Users\\MissanMi\\project\\DL_check_selenium\\IEDriverServer.exe")
 
 customer_email = "JohnSmith@gmail.com"
 customer_phone = "9051234567"
@@ -44,28 +43,26 @@ results_page = page_object.Results_multiple(browser)
 
 common_page.get_page()
 
-#Home
+# Home
 time.sleep(waittime)
 main_page.proceed()
 time.sleep(waittime)
 
-#Enter License Page
+# Enter License Page
 try:
     enter_licence_page.multiple_licences()
     time.sleep(waittime)
 except:
     print('Multiple Licence tab not loaded')
 
-#radial buttons
+# radial buttons
 enter_licence_page.csv_radial()
 
-#csv upload
+# csv upload
 csv_location = os.getcwd() + '\\licences-tests.csv'
-#browser.find_element_by_id('excelInput').send_keys(csv_location)
-#browser.find_element_by_xpath('//*[@id="excelInput"]').send_keys(csv_location)
 enter_licence_page.csv_upload(csv_location)
 
-#error icon should be shown for invalid licences in csv
+# error icon should be shown for invalid licences in csv
 try:
     'warning' in browser.page_source
 except:
@@ -73,31 +70,29 @@ except:
 
 
 #
-#ensuring that all entries from the csv were uploaded,note validation is not 100%
+# ensuring that all entries from the csv were uploaded,note validation is not 100%
 #
 # open the file in universal line ending mode 
 with open('licences-tests.csv', 'rU') as infile:
-  # read the file as a dictionary for each row ({header : value})
-  reader = csv.DictReader(infile)
-  data = {}
-  for row in reader:
-    for header, value in row.items():
-      try:
-        data[header].append(value)
-      except KeyError:
-        data[header] = [value]
+    # read the file as a dictionary for each row ({header : value})
+    reader = csv.DictReader(infile)
+    data = {}
+    for row in reader:
+        for header, value in row.items():
+            try:
+                data[header].append(value)
+            except KeyError:
+                data[header] = [value]
 from_csv = data['Drivers Licence']
 
 for number in from_csv:
     if number.count("-") != 2 and len(number) != 17: from_csv.remove(number)
 
 time.sleep(waittime)
-print(from_csv)
 count = 0
 for dl in from_csv:
-    print(dl,'=',enter_licence_page.table_row_column(count+1,2))
-    assert dl in enter_licence_page.table_row_column(count+1,2)
-    count=count+1
+    assert dl in enter_licence_page.table_row_column(count+1, 2)
+    count = count+1
 
 total = 'Total Licence(s): '+str(len(from_csv))+' | Amount ($): '+str(len(from_csv)*2)+'.00'
 assert enter_licence_page.total() == total
@@ -106,7 +101,7 @@ common_page.refresh()
 
 count = 0
 for dl in from_csv:
-    assert dl in enter_licence_page.table_row_column(count+1,2)
+    assert dl in enter_licence_page.table_row_column(count+1, 2)
     count=count+1
 
 total = 'Total Licence(s): '+str(len(from_csv))+' | Amount ($): '+str(len(from_csv)*2)+'.00'
@@ -119,7 +114,7 @@ time.sleep(waittime)
 count = 0
 for dl in from_csv:
     assert dl in confirm_page.table_row_column(count+1,2)
-    count=count+1
+    count = count+1
 
 total = 'Total Licence(s): '+str(len(from_csv))+' | Amount ($): '+str(len(from_csv)*2)+'.00'
 assert confirm_page.total() == total
@@ -129,12 +124,12 @@ browser.refresh()
 count = 0
 for dl in from_csv:
     assert dl in confirm_page.table_row_column(count+1,2)
-    count=count+1
+    count = count+1
 
 total = 'Total Licence(s): '+str(len(from_csv))+' | Amount ($): '+str(len(from_csv)*2)+'.00'
 assert confirm_page.total() == total
 
-#Customer Information
+# Customer Information
 confirm_page.email(customer_email)
 confirm_page.phone(customer_phone)
 confirm_page.name(customer_name)
@@ -158,32 +153,32 @@ while True:
     if 'https://www.beanstream.com' in browser.current_url:
         break
 
-
+time.sleep(waittime)
 payment_page.enter_details(len(from_csv))
 
 
-while browser.current_url != 'http://etcbitdcapmdw30.cihs.ad.gov.on.ca/Pris_Carrier/dlc/report':
+url = common_page.get_baseurl()
+url = url + 'report'
+
+while browser.current_url != url:
     time.sleep(5)
     
 
-#results_single_page.status()       no confirmed statuses given for spefic DL
-#results_single_page.description()  ^^^^
+# results_single_page.status()       no confirmed statuses given for spefic DL
+# results_single_page.description()  ^^^^
 results_page.expand()
 
-#purchaser name
+# purchaser name
 results_page.purchaser_name(customer_name)
 
-#confirm price on transaction details
+# confirm price on transaction details
 result_price = '$'+str(len(from_csv)*2)+'.00 CAD'
 results_page.result_price(result_price)
 
-#confirm dl and status
+# confirm dl and status
 results_page.dl_number_and_status(from_csv)
 
-#print status totals 
-print(results_page.status())
-
-#confirm payment info
+# confirm payment info
 payment_page.payment_results()
 
 print('Basic Usage Passing')

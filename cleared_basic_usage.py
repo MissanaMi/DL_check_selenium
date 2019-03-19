@@ -49,27 +49,7 @@ enter_licence_page.single_input1(dl_number[0:5])
 
 enter_licence_page.single_input2(dl_number[6:11])
 
-enter_licence_page.single_input3('aaaaa')
-
-common_page.next()
-time.sleep(waittime)
-
-#error icon should be shown for invalid format
-try:
-    'warning' in browser.page_source
-except:
-    print("DL error icon not shown")
-
-
-enter_licence_page.single_input3_clear()
-
 enter_licence_page.single_input3(dl_number[12:17])
-
-#check icon should be shown after invalid input is corrected
-try:
-    'check_circle' in browser.page_source
-except:
-    print("DL check icon not shown")
 
 common_page.next()
 time.sleep(waittime)

@@ -1,5 +1,4 @@
 from selenium import webdriver
-from selenium.webdriver.support.ui import Select
 import time
 import random
 import string
@@ -7,9 +6,9 @@ import page_object
 import pay
 
 browser = webdriver.Firefox()
-#browser = webdriver.Chrome()
-#browser = webdriver.Edge()
-#browser = webdriver.Ie(r"C:\\Users\\MissanMi\\project\\DL_check_selenium\\IEDriverServer.exe")
+# browser = webdriver.Chrome()
+# browser = webdriver.Edge()
+# browser = webdriver.Ie(r"C:\\Users\\MissanMi\\project\\DL_check_selenium\\IEDriverServer.exe")
 
 customer_email = "JohnSmith@gmail.com"
 customer_phone = "9051234567"
@@ -36,12 +35,12 @@ dl_numbers = []
 
 common_page.get_page()
 
-#Home
+# Home
 time.sleep(waittime)
 main_page.proceed()
 time.sleep(waittime)
 
-#Enter License Page
+# Enter License Page
 try:
     enter_licence_page.multiple_licences()
     time.sleep(waittime)
@@ -49,25 +48,25 @@ except:
     print('Multiple Licence tab not loaded')
 
 
-#generate 100 random dls
-total_dls = 54
-#click more x many times
-mores = 5
+# generate 100 random dls
+total_dls = 100
+# click more x many times
+mores = 9
 
 for i in range(total_dls):
     dl_number = random.choice(string.ascii_uppercase)
     for j in range(14):
         if j == 12:
-            dl_number = dl_number + str(random.randint(0,3))
+            dl_number = dl_number + str(random.randint(0, 3))
         elif j == 13:
             if dl_number[13] == '3':
-                dl_number = dl_number + str(random.randint(0,1))
+                dl_number = dl_number + str(random.randint(0, 1))
             elif dl_number[13] == '0':
-                dl_number = dl_number + str(random.randint(1,9))
+                dl_number = dl_number + str(random.randint(1, 9))
             else:
-                dl_number = dl_number + str(random.randint(0,9))
+                dl_number = dl_number + str(random.randint(0, 9))
         else:
-            dl_number = dl_number + str(random.randint(0,9))
+            dl_number = dl_number + str(random.randint(0, 9))
     enter_licence_page.multiple_input1(dl_number[0:5])
     enter_licence_page.multiple_input2(dl_number[5:10])
     enter_licence_page.multiple_input3(dl_number[10:17]) 
@@ -79,12 +78,12 @@ time.sleep(waittime)
 
 for _ in range(mores):
     enter_licence_page.load_more()
-    time.sleep(waittime*2)
+    time.sleep(waittime)
 
 count = 0
 for dl in dl_numbers:
-    assert dl in enter_licence_page.table_row_column(count+1,2).replace("-", "")
-    count=count+1
+    assert dl in enter_licence_page.table_row_column(count+1, 2).replace("-", "")
+    count = count+1
 
 total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
 assert enter_licence_page.total() == total
@@ -93,12 +92,12 @@ browser.refresh()
 
 for _ in range(mores):
     enter_licence_page.load_more()
-    time.sleep(waittime*2)
+    time.sleep(waittime)
 
 count = 0
 for dl in dl_numbers:
     assert dl in enter_licence_page.table_row_column(count+1,2).replace("-", "")
-    count=count+1
+    count = count+1
 
 total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
 assert enter_licence_page.total() == total
@@ -107,7 +106,7 @@ assert enter_licence_page.total() == total
 browser.find_element_by_partial_link_text('Next').click()
 time.sleep(waittime)
 
-#Customer Information
+# Customer Information
 confirm_page.email(customer_email)
 confirm_page.phone(customer_phone)
 confirm_page.name(customer_name)
@@ -123,12 +122,12 @@ confirm_page.province_canada(customer_province)
 
 for _ in range(mores):
     confirm_page.load_more()
-    time.sleep(waittime*2)
+    time.sleep(waittime)
 
 count = 0
 for dl in dl_numbers:
-    assert dl in confirm_page.table_row_column(count+1,2).replace("-", "")
-    count=count+1
+    assert dl in confirm_page.table_row_column(count+1, 2).replace("-", "")
+    count = count+1
 
 total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
 assert confirm_page.total() == total
@@ -143,28 +142,29 @@ while True:
     if 'https://www.beanstream.com' in browser.current_url:
         break
 
-
+time.sleep(waittime)
 payment_page.enter_details(total_dls)
 
-while True:
-    if 'Pris_Carrier/dlc/report' in browser.current_url:
-        break
+url = common_page.get_baseurl()
+url = url + 'report'
+
+while browser.current_url != url:
     time.sleep(5)
 
-#results_single_page.status()       no confirmed statuses given for spefic DL
-#results_single_page.description()  ^^^^
+# results_single_page.status()       no confirmed statuses given for spefic DL
+# results_single_page.description()  ^^^^
 results_page_multiple.expand()
 
-#purchaser name
+# purchaser name
 results_page_multiple.purchaser_name(customer_name)
 
-#confirm trasaction price
+# confirm transaction price
 result_price = '$'+str(len(dl_numbers)*2)+'.00 CAD'
 results_page_multiple.result_price(result_price)
 
-#confirm payment details
+# confirm payment details
 payment_page.payment_results()
 
-print('Basic Usage Passing')
+print('Business manual', total_dls, 'Passing')
 
 browser.close()

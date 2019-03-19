@@ -1,13 +1,12 @@
 from selenium import webdriver
-from selenium.webdriver.support.ui import Select
 import time
 import page_object
 import pay
 
 browser = webdriver.Firefox()
-#browser = webdriver.Chrome()
-#browser = webdriver.Edge()
-#browser = webdriver.Ie(r"C:\\Users\\MissanMi\\project\\DL_check_selenium\\IEDriverServer.exe")
+# browser = webdriver.Chrome()
+# browser = webdriver.Edge()
+# browser = webdriver.Ie(r"C:\\Users\\MissanMi\\project\\DL_check_selenium\\IEDriverServer.exe")
 
 waittime = 3
 
@@ -36,17 +35,18 @@ dl_numbers = ['L0127-15675-70417','K0733-19005-65811','M2135-18407-40922','M8231
 
 common_page.get_page()
 
-#Home
+# Home
 time.sleep(waittime)
 main_page.proceed()
 time.sleep(waittime)
 
-#Enter License Page
-try:
-    enter_licence_page.multiple_licences()
-    time.sleep(waittime)
-except:
-    print('Multiple Licence tab not loaded')
+# Enter License Page
+while True:
+    try:
+        enter_licence_page.multiple_licences()
+        break
+    except:
+        time.sleep(waittime)
 
 enter_licence_page.multiple_input1(dl_numbers[0][0:5])
 
@@ -57,7 +57,7 @@ enter_licence_page.multiple_input3('aaaaa')
 enter_licence_page.add_licence()
 time.sleep(waittime)
 
-#error icon should be shown for invalid format
+# error icon should be shown for invalid format
 try:
     'warning' in browser.page_source
 except:
@@ -68,7 +68,7 @@ enter_licence_page.multiple_input3_clear()
 
 enter_licence_page.multiple_input3(dl_numbers[0][12:17])
 
-#check icon should be shown after invalid input is corrected
+# check icon should be shown after invalid input is corrected
 try:
     'check_circle' in browser.page_source
 except:
@@ -77,7 +77,7 @@ except:
 time.sleep(waittime)
 enter_licence_page.add_licence()
 
-for i in range(1,len(dl_numbers)):
+for i in range(len(dl_numbers)):
     if i != 0:
         enter_licence_page.multiple_input1(dl_numbers[i][0:5])
         enter_licence_page.multiple_input2(dl_numbers[i][6:11])
@@ -89,7 +89,7 @@ time.sleep(waittime)
 count = 0
 for dl in dl_numbers:
     assert dl in enter_licence_page.table_row_column(count+1,2)
-    count=count+1
+    count = count+1
 
 total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
 assert enter_licence_page.total() == total
@@ -98,8 +98,8 @@ browser.refresh()
 
 count = 0
 for dl in dl_numbers:
-    assert dl in enter_licence_page.table_row_column(count+1,2)
-    count=count+1
+    assert dl in enter_licence_page.table_row_column(count+1, 2)
+    count = count+1
 
 total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
 assert enter_licence_page.total() == total
@@ -109,8 +109,8 @@ time.sleep(waittime)
 
 count = 0
 for dl in dl_numbers:
-    assert dl in confirm_page.table_row_column(count+1,2)
-    count=count+1
+    assert dl in confirm_page.table_row_column(count+1, 2)
+    count = count+1
 
 total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
 assert confirm_page.total() == total
@@ -120,13 +120,13 @@ time.sleep(waittime)
 
 count = 0
 for dl in dl_numbers:
-    assert dl in confirm_page.table_row_column(count+1,2)
-    count=count+1
+    assert dl in confirm_page.table_row_column(count+1, 2)
+    count = count+1
 
 total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
 assert confirm_page.total() == total
 
-#Customer Information
+# Customer Information
 confirm_page.email(customer_email)
 confirm_page.phone(customer_phone)
 confirm_page.name(customer_name)
@@ -149,32 +149,34 @@ while True:
     if 'https://www.beanstream.com' in browser.current_url:
         break
 
-
+time.sleep(waittime)
 payment_page.enter_details(len(dl_numbers))
 
+url = common_page.get_baseurl()
+url = url + 'report'
 
-while browser.current_url != 'http://etcbitdcapmdw30.cihs.ad.gov.on.ca/Pris_Carrier/dlc/report':
+while browser.current_url != url:
     time.sleep(5)
     
 
-#results_single_page.status()       no confirmed statuses given for spefic DL
-#results_single_page.description()  ^^^^
+# results_single_page.status()       no confirmed statuses given for spefic DL
+# results_single_page.description()  ^^^^
 results_multiple_page.expand()
 
-#purchaser name
+# purchaser name
 results_multiple_page.purchaser_name(customer_name)
 
-#confirm price on transaction details
+# confirm price on transaction details
 result_price = '$'+str(len(dl_numbers)*2)+'.00 CAD'
 results_multiple_page.result_price(result_price)
 
-#confirm dl and status
+# confirm dl and status
 results_multiple_page.dl_number_and_status(dl_numbers)
 
-#print status totals 
-print(results_multiple_page.status())
+# status banner is correct
+results_multiple_page.status_banner()
 
-#confirm payment info
+# confirm payment info
 payment_page.payment_results()
 
 print('Basic Usage Passing')
