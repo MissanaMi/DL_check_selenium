@@ -19,7 +19,7 @@ dl_key = {
     'A1013-78506-55101': 'Valid'
 }
 
-status_banner = ['1', '0', '0', '6', '3']
+status_banner = ['1', '0', '0', '0', '6', '3']
 
 
 class BasePage(object):
@@ -71,7 +71,7 @@ class EnterDL(BasePage):
         element.click()
 
     def multiple_licences(self):
-        element = self.browser.find_element_by_link_text('Check Multiple Driver\'s Licences')
+        element = self.browser.find_element_by_link_text('Check Multiple Licences')
         element.click()
 
     def single_input1(self, number):
@@ -95,7 +95,7 @@ class EnterDL(BasePage):
         element.click()
 
     def csv_radial(self):
-        element = self.browser.find_element_by_link_text('Upload a CSV File')
+        element = self.browser.find_element_by_link_text('Upload CSV File')
         element.click()
 
     def csv_upload(self, location):
@@ -119,14 +119,15 @@ class EnterDL(BasePage):
         element.clear()
     
     def add_licence(self):
-        element = self.browser.find_element_by_partial_link_text('Add Licence')
+        element = self.browser.find_element_by_partial_link_text('Add to Order')
         element.click()
 
-    def total(self):
-        return self.browser.find_element_by_xpath('/html/body/app-root/app-enter-details/div/app-order-table/div[1]/div[2]/h4').text
+    def total(self, value):
+        element = self.browser.find_element_by_xpath('/html/body/app-root/app-enter-details/div[1]/div/app-order-table/div[1]/div[2]/h4').text
+        assert 'Amount ($): '+str(value*2)+'.00' in element
 
-    def table_row_column(self,row,column):
-        return self.browser.find_element_by_xpath('/html/body/app-root/app-enter-details/div/app-order-table/table/tbody/tr['+str(row)+']/td['+str(column)+']').text.replace(" ", "")
+    def table_row_column(self, row, column):
+        return self.browser.find_element_by_xpath('/html/body/app-root/app-enter-details/div[1]/div/app-order-table/table/tbody/tr['+str(row)+']/td['+str(column)+']').text.replace(" ", "")
 
     def load_more(self):
         element = self.browser.find_element_by_link_text('Load More')
@@ -180,11 +181,12 @@ class ConfirmOrder(BasePage):
         element = self.browser.find_element_by_id('postalCode')
         element.send_keys(value)
 
-    def total(self):
-        return self.browser.find_element_by_xpath('/html/body/app-root/app-confirm-order/div/app-order-table/div[1]/div[2]/h4').text
+    def total(self, value):
+        element = self.browser.find_element_by_xpath('/html/body/app-root/app-confirm-order/div/div[2]/div[3]/h4').text
+        assert 'Amount ($): ' + str(value*2) + '.00' in element
 
     def table(self):
-        return self.browser.find_element_by_xpath('/html/body/app-root/app-confirm-order/div/app-order-table/table/tbody/tr/td[2]').text.replace(" ", "")
+        return self.browser.find_element_by_xpath('/html/body/app-root/app-confirm-order/div/app-order-table/table/tbody/tr/td[1]').text.replace(" ", "")
 
     def table_row_column(self, row, column):
         return self.browser.find_element_by_xpath('/html/body/app-root/app-confirm-order/div/app-order-table/table/tbody/tr['+str(row)+']/td['+str(column)+']').text.replace(" ", "")
@@ -194,22 +196,30 @@ class ConfirmOrder(BasePage):
         element.click()
         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
+    def my_order(self):
+        element = self.browser.find_element_by_link_text('My Order')
+        element.click()
+
+    def customer_info(self):
+        element = self.browser.find_element_by_link_text('Customer Information')
+        element.click()
+
 
 class Results_single(BasePage):
     def status(self, value):
-        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[4]/div[1]/div/h4[1]').text == value
+        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[6]/div[1]/div/h4[1]').text == value
     
     def description(self, value):
         assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[4]/div[3]/div/p').text == value
     
     def dl_number(self, value):
-        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[4]/div[1]/div/h4[2]').text == value
+        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[6]/div[1]/div/h4[2]').text == value
     
     def purchaser_name(self, value):
-        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/div/div/div[1]/div/div[12]').text == value
+        assert value in self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[7]/div/div/div[1]/div/div[12]').text
     
     def result_price(self, value):
-        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/div/div/div[2]/div/div[2]').text == value
+        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[7]/div/div/div[2]/div/div[2]').text == value
 
 
 class Results_multiple(BasePage):
@@ -230,17 +240,17 @@ class Results_multiple(BasePage):
             count = count+1
 
     def purchaser_name(self, value):
-        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/div/div/div[1]/div/div[12]').text == value
+        assert value in self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[8]/div/div/div[1]/div/div[12]').text
     
     def result_price(self, value):
-        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/div/div/div[2]/div/div[2]').text == value
+        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[8]/div/div/div[2]/div/div[2]').text == value
 
     def expand(self):
-        self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/a/div/div[2]/span/span').click()
+        self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[8]/a/div/div[2]/span').click()
 
     def status_banner(self):
         values = []
-        for i in range(1, 6):
-            string = '/html/body/app-root/app-report/div/div[4]/div['+str(i)+']/div/div[3]/p'
+        for i in range(1, 7):
+            string = '/html/body/app-root/app-report/div/div[6]/div['+str(i)+']/div/div[3]/p'
             values.append(self.browser.find_element_by_xpath(string).text)
         assert values == status_banner

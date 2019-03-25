@@ -85,8 +85,8 @@ for dl in dl_numbers:
     assert dl in enter_licence_page.table_row_column(count+1, 2).replace("-", "")
     count = count+1
 
-total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
-assert enter_licence_page.total() == total
+
+enter_licence_page.total(len(dl_numbers))
 
 browser.refresh()
 
@@ -99,8 +99,8 @@ for dl in dl_numbers:
     assert dl in enter_licence_page.table_row_column(count+1,2).replace("-", "")
     count = count+1
 
-total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
-assert enter_licence_page.total() == total
+
+enter_licence_page.total(len(dl_numbers))
 
 
 browser.find_element_by_partial_link_text('Next').click()
@@ -120,6 +120,7 @@ confirm_page.country(customer_country)
 confirm_page.province_canada(customer_province)
 
 
+confirm_page.my_order()
 for _ in range(mores):
     confirm_page.load_more()
     time.sleep(waittime)
@@ -129,8 +130,8 @@ for dl in dl_numbers:
     assert dl in confirm_page.table_row_column(count+1, 2).replace("-", "")
     count = count+1
 
-total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
-assert confirm_page.total() == total
+
+confirm_page.total(len(dl_numbers))
 
 common_page.next()
 

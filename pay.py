@@ -47,11 +47,11 @@ class PaymentPage(BasePage):
 
     def payment_results(self):
         #check details is correctly displayed on results page
-        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/div/div/div[1]/div/div[14]').text == name
+        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[8]/div/div/div[1]/div/div[14]').text == name
 
-        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/div/div/div[1]/div/div[16]').text == cardtype
+        assert self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[8]/div/div/div[1]/div/div[16]').text == cardtype
             
-        cardnumber =self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[5]/div/div/div[1]/div/div[18]').text
+        cardnumber =self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[8]/div/div/div[1]/div/div[18]').text
         assert cardnumber[12:16] == card[12:16]
 
 

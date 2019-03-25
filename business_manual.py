@@ -44,6 +44,7 @@ time.sleep(waittime)
 while True:
     try:
         enter_licence_page.multiple_licences()
+        time.sleep(waittime)
         break
     except:
         time.sleep(waittime)
@@ -82,17 +83,17 @@ for i in range(len(dl_numbers)):
         enter_licence_page.multiple_input1(dl_numbers[i][0:5])
         enter_licence_page.multiple_input2(dl_numbers[i][6:11])
         enter_licence_page.multiple_input3(dl_numbers[i][12:17])
-        time.sleep(waittime/3)
+        time.sleep(waittime/2)
         enter_licence_page.add_licence()
 
 time.sleep(waittime)
 count = 0
 for dl in dl_numbers:
-    assert dl in enter_licence_page.table_row_column(count+1,2)
+    assert dl in enter_licence_page.table_row_column(count+1, 2)
     count = count+1
 
-total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
-assert enter_licence_page.total() == total
+
+enter_licence_page.total(len(dl_numbers))
 
 browser.refresh()
 
@@ -101,31 +102,34 @@ for dl in dl_numbers:
     assert dl in enter_licence_page.table_row_column(count+1, 2)
     count = count+1
 
-total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
-assert enter_licence_page.total() == total
+
+enter_licence_page.total(len(dl_numbers))
 
 common_page.next()
 time.sleep(waittime)
 
+confirm_page.my_order()
 count = 0
 for dl in dl_numbers:
     assert dl in confirm_page.table_row_column(count+1, 2)
     count = count+1
 
-total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
-assert confirm_page.total() == total
+
+confirm_page.total(len(dl_numbers))
 
 browser.refresh()
 time.sleep(waittime)
 
+confirm_page.my_order()
 count = 0
 for dl in dl_numbers:
     assert dl in confirm_page.table_row_column(count+1, 2)
     count = count+1
 
-total = 'Total Licence(s): '+str(len(dl_numbers))+' | Amount ($): '+str(len(dl_numbers)*2)+'.00'
-assert confirm_page.total() == total
 
+confirm_page.total(len(dl_numbers))
+
+confirm_page.customer_info()
 # Customer Information
 confirm_page.email(customer_email)
 confirm_page.phone(customer_phone)
@@ -179,6 +183,6 @@ results_multiple_page.status_banner()
 # confirm payment info
 payment_page.payment_results()
 
-print('Basic Usage Passing')
+print('Business Manual Usage Passing')
 
 browser.close()

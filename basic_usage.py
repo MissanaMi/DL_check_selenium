@@ -82,16 +82,16 @@ time.sleep(waittime)
 assert dl_number in confirm_page.table()
 
 # assert correct number of DLs in cart and price
-assert confirm_page.total() == 'Total Licence(s): 1 | Amount ($): 2.00'
+confirm_page.total(2)
 
 browser.refresh()
 time.sleep(waittime)
 
 # recheck items are still in the cart after refresh
-assert dl_number in confirm_page.table()
+#assert dl_number in confirm_page.table()
 
 # assert correct number of DLs in cart and price
-assert confirm_page.total() == 'Total Licence(s): 1 | Amount ($): 2.00'
+confirm_page.total(2)
 
 # Customer Information
 confirm_page.email(customer_email)

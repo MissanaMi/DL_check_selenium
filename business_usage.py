@@ -94,8 +94,8 @@ for dl in from_csv:
     assert dl in enter_licence_page.table_row_column(count+1, 2)
     count = count+1
 
-total = 'Total Licence(s): '+str(len(from_csv))+' | Amount ($): '+str(len(from_csv)*2)+'.00'
-assert enter_licence_page.total() == total
+
+enter_licence_page.total(len(from_csv))
 
 common_page.refresh()
 
@@ -104,31 +104,33 @@ for dl in from_csv:
     assert dl in enter_licence_page.table_row_column(count+1, 2)
     count=count+1
 
-total = 'Total Licence(s): '+str(len(from_csv))+' | Amount ($): '+str(len(from_csv)*2)+'.00'
-assert enter_licence_page.total() == total
+
+enter_licence_page.total(len(from_csv))
 
 common_page.next()
 
 time.sleep(waittime)
 
+confirm_page.my_order()
 count = 0
 for dl in from_csv:
     assert dl in confirm_page.table_row_column(count+1,2)
     count = count+1
 
-total = 'Total Licence(s): '+str(len(from_csv))+' | Amount ($): '+str(len(from_csv)*2)+'.00'
-assert confirm_page.total() == total
+confirm_page.total(len(from_csv))
 
 browser.refresh()
 
+confirm_page.my_order()
 count = 0
 for dl in from_csv:
     assert dl in confirm_page.table_row_column(count+1,2)
     count = count+1
 
-total = 'Total Licence(s): '+str(len(from_csv))+' | Amount ($): '+str(len(from_csv)*2)+'.00'
-assert confirm_page.total() == total
 
+confirm_page.total(len(from_csv))
+
+confirm_page.customer_info()
 # Customer Information
 confirm_page.email(customer_email)
 confirm_page.phone(customer_phone)
@@ -181,6 +183,6 @@ results_page.dl_number_and_status(from_csv)
 # confirm payment info
 payment_page.payment_results()
 
-print('Basic Usage Passing')
+print('Business CSV Usage Passing')
 
 browser.close()
