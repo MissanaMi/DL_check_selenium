@@ -54,6 +54,9 @@ class PaymentPage(BasePage):
         cardnumber =self.browser.find_element_by_xpath('/html/body/app-root/app-report/div/div[8]/div/div/div[1]/div/div[18]').text
         assert cardnumber[12:16] == card[12:16]
 
+    def back(self):
+        element = self.browser.find_element_by_xpath('/html/body/table/tbody/tr/td[1]/form/table[2]/tbody/tr[13]/td/table/tbody/tr/td[1]/input')
+        element.click()
 
 
 

@@ -63,6 +63,10 @@ class CommonPage(BasePage):
     def get_baseurl(self):
         return BaseURL
 
+    def cancel_confirm(self):
+        element = self.browser.find_element_by_partial_link_text('YES, CANCEL PROCESS')
+        element.click()
+
 
 class EnterDL(BasePage):
 

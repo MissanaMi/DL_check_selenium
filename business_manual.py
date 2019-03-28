@@ -3,8 +3,8 @@ import time
 import page_object
 import pay
 
-browser = webdriver.Firefox()
-# browser = webdriver.Chrome()
+# browser = webdriver.Firefox()
+browser = webdriver.Chrome()
 # browser = webdriver.Edge()
 # browser = webdriver.Ie(r"C:\\Users\\MissanMi\\project\\DL_check_selenium\\IEDriverServer.exe")
 
